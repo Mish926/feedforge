@@ -1,0 +1,25 @@
+{
+  "test_full_ranking": {
+    "recall@10": 0.2958609271523179,
+    "ndcg@10": 0.16529285513012615,
+    "recall@20": 0.40413907284768213,
+    "ndcg@20": 0.19272714924338638
+  },
+  "test_sampled_100_negatives": {
+    "sampled100_recall@10": 0.8205298013245033,
+    "sampled100_ndcg@10": 0.6182248929214967
+  },
+  "popularity_baseline_full_ranking": {
+    "recall@10": 0.0369205298013245,
+    "ndcg@10": 0.018029715114141812,
+    "recall@20": 0.06821192052980132,
+    "ndcg@20": 0.025836209120791386
+  },
+  "sampled_vs_full_recall10_inflation": 2.77,
+  "checkpoint_valid_metrics": {
+    "recall@10": 0.3089403973509934,
+    "ndcg@10": 0.16889451765856206,
+    "recall@20": 0.420364238410596,
+    "ndcg@20": 0.19693788597915346
+  }
+}

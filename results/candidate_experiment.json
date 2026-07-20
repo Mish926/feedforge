@@ -1,0 +1,74 @@
+{
+  "collaborative": {
+    "overall": {
+      "cand_recall@20": 0.40413907284768213,
+      "cand_recall@50": 0.5531456953642384,
+      "cand_recall@100": 0.6693708609271524
+    },
+    "by_popularity": {
+      "bucket0": {
+        "cand_recall@20": 0.28897715988083417,
+        "cand_recall@50": 0.43346573982125125,
+        "cand_recall@100": 0.551142005958292
+      },
+      "bucket1": {
+        "cand_recall@20": 0.4141012909632572,
+        "cand_recall@50": 0.5695134061569017,
+        "cand_recall@100": 0.685700099304866
+      },
+      "bucket2": {
+        "cand_recall@20": 0.5094433399602386,
+        "cand_recall@50": 0.6565606361829026,
+        "cand_recall@100": 0.7713717693836978
+      }
+    }
+  },
+  "content": {
+    "overall": {
+      "cand_recall@20": 0.01456953642384106,
+      "cand_recall@50": 0.029966887417218542,
+      "cand_recall@100": 0.05066225165562914
+    },
+    "by_popularity": {
+      "bucket0": {
+        "cand_recall@20": 0.02035749751737835,
+        "cand_recall@50": 0.041708043694141016,
+        "cand_recall@100": 0.06355511420059583
+      },
+      "bucket1": {
+        "cand_recall@20": 0.01737835153922542,
+        "cand_recall@50": 0.03128103277060576,
+        "cand_recall@100": 0.055114200595829194
+      },
+      "bucket2": {
+        "cand_recall@20": 0.005964214711729622,
+        "cand_recall@50": 0.016898608349900597,
+        "cand_recall@100": 0.03330019880715706
+      }
+    }
+  },
+  "hybrid": {
+    "overall": {
+      "cand_recall@20": 0.29271523178807946,
+      "cand_recall@50": 0.45,
+      "cand_recall@100": 0.5652317880794702
+    },
+    "by_popularity": {
+      "bucket0": {
+        "cand_recall@20": 0.20407149950347567,
+        "cand_recall@50": 0.33664349553128103,
+        "cand_recall@100": 0.4528301886792453
+      },
+      "bucket1": {
+        "cand_recall@20": 0.2984111221449851,
+        "cand_recall@50": 0.4627606752730884,
+        "cand_recall@100": 0.5814299900695135
+      },
+      "bucket2": {
+        "cand_recall@20": 0.3757455268389662,
+        "cand_recall@50": 0.5506958250497018,
+        "cand_recall@100": 0.661530815109344
+      }
+    }
+  }
+}
