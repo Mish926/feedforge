@@ -80,13 +80,29 @@ def main() -> None:
     item_pop = build_item_popularity(split.train, split.n_items)
     cindex = ContentIndex.from_npz(args.embeddings, split.item_id_map) if args.embeddings else None
 
-    # Training task: history = train, target = valid
+    # Training task: history = train, target = valid. 10% of users are
+    # held out for early stopping so the test set is never consulted
+    # during model selection (early-stopping on test is leakage, and the
+    # first version of this script did exactly that -- fixed and noted).
     print("candidates for training task...")
     tr_hist = split.train
     tr_cands, tr_scores = candidates_with_scores(
         model, tr_hist, split.mask_token, cfg["max_len"], args.k, args.device)
-    train_ds = build_ranking_dataset(tr_cands, tr_scores, tr_hist,
-                                     split.valid_target, item_pop, cindex)
+
+    rng = np.random.default_rng(42)
+    n_users = len(tr_hist)
+    es_idx = set(rng.choice(n_users, size=max(1, n_users // 10), replace=False).tolist())
+    fit = [i for i in range(n_users) if i not in es_idx]
+    es = sorted(es_idx)
+
+    def subset(idx):
+        return build_ranking_dataset(
+            [tr_cands[i] for i in idx], [tr_scores[i] for i in idx],
+            [tr_hist[i] for i in idx], [split.valid_target[i] for i in idx],
+            item_pop, cindex)
+
+    train_ds = subset(fit)
+    earlystop_ds = subset(es)
 
     # Test task: history = train + valid, target = test
     print("candidates for test task...")
@@ -97,7 +113,7 @@ def main() -> None:
                                     split.test_target, item_pop, cindex)
 
     print("training LambdaRank...")
-    booster = train_ranker(train_ds, valid_ds=test_ds)
+    booster = train_ranker(train_ds, valid_ds=earlystop_ds)
 
     baseline = ranked_metrics(te_cands, split.test_target)
     reranked = rerank(booster, test_ds)

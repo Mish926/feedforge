@@ -1,0 +1,26 @@
+{
+  "candidate_recall_at_k_ceiling": 0.6693708609271524,
+  "baseline_bert4rec_order": {
+    "recall@10": 0.2958609271523179,
+    "ndcg@10": 0.16529285528917748,
+    "recall@20": 0.40413907284768213,
+    "ndcg@20": 0.19272714765844545
+  },
+  "reranked_lambdarank": {
+    "recall@10": 0.28344370860927154,
+    "ndcg@10": 0.15591851930431938,
+    "recall@20": 0.39503311258278145,
+    "ndcg@20": 0.18410363983609548
+  },
+  "feature_importance_gain": {
+    "collab_rank": 5420.5,
+    "collab_score": 2424.7,
+    "content_sim": 109.8,
+    "content_sim_last": 138.4,
+    "has_content": 0.0,
+    "item_pop_log": 973.8,
+    "user_len_log": 294.1
+  },
+  "best_iteration": 2,
+  "content_features_enabled": true
+}
