@@ -1,5 +1,9 @@
 torch>=2.0
 pandas
-numpy<2
+numpy
 tqdm
 pytest
+faiss-cpu
+requests
+torchvision
+pillow
