@@ -1,0 +1,34 @@
+{
+  "candidate_recall_at_k_ceiling": 0.6693708609271524,
+  "baseline_bert4rec_order": {
+    "recall@10": 0.2958609271523179,
+    "ndcg@10": 0.16529285528917748,
+    "recall@20": 0.40413907284768213,
+    "ndcg@20": 0.19272714765844545
+  },
+  "reranked_lambdarank": {
+    "recall@10": 0.2933774834437086,
+    "ndcg@10": 0.16660679691878894,
+    "recall@20": 0.40264900662251657,
+    "ndcg@20": 0.194228485039592
+  },
+  "feature_importance_gain": {
+    "collab_rank": 23150.4,
+    "collab_score": 7151.3,
+    "content_sim": 726.3,
+    "content_sim_last": 466.0,
+    "has_content": 0.0,
+    "item_pop_log": 4401.9,
+    "user_len_log": 704.2,
+    "genre_sim_profile": 1196.8,
+    "genre_sim_last": 607.2,
+    "item_year": 635.0,
+    "cooc_pmi_mean": 3074.4,
+    "user_gender": 0.0,
+    "user_age": 64.6,
+    "user_occupation": 2333.4
+  },
+  "best_iteration": 15,
+  "content_features_enabled": true,
+  "aux_features_enabled": true
+}

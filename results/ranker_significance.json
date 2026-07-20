@@ -1,0 +1,15 @@
+{
+  "n_users": 6040,
+  "mean_ndcg10_baseline": 0.16529285528917817,
+  "mean_ndcg10_reranked": 0.16660679691878966,
+  "mean_delta": 0.0013139416296114865,
+  "delta_95ci": [
+    -0.0023448114078284807,
+    0.004959151935440541
+  ],
+  "ci_excludes_zero": false,
+  "bootstrap_p_delta_leq_0": 0.2485,
+  "users_improved": 736,
+  "users_hurt": 642,
+  "users_unchanged": 4662
+}
