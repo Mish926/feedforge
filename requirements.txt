@@ -7,3 +7,4 @@ faiss-cpu
 requests
 torchvision
 pillow
+lightgbm
