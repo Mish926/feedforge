@@ -30,10 +30,17 @@ sys.path.insert(0, str(Path(__file__).resolve().parent.parent))
 from feedforge.content import ContentIndex  # noqa: E402
 from feedforge.data import PAD, build_sequences, inference_batch, load_movielens_1m  # noqa: E402
 from feedforge.model import BERT4Rec  # noqa: E402
+from feedforge.features import (  # noqa: E402
+    AUX_CATEGORICAL,
+    AuxFeatureContext,
+    build_cooccurrence_pmi,
+    load_movie_features,
+    load_user_features,
+)
 from feedforge.ranker import (  # noqa: E402
-    FEATURE_NAMES,
     build_item_popularity,
     build_ranking_dataset,
+    feature_names,
     ranked_metrics,
     rerank,
     train_ranker,
@@ -64,6 +71,10 @@ def main() -> None:
     p.add_argument("--checkpoint", required=True)
     p.add_argument("--embeddings", default=None,
                    help="content_embeddings.npz; omit to ablate content features")
+    p.add_argument("--movies", default=None,
+                   help="ml-1m/movies.dat: enables genre/year features")
+    p.add_argument("--users", default=None,
+                   help="ml-1m/users.dat: enables demographic features (requires --movies)")
     p.add_argument("--k", type=int, default=100)
     p.add_argument("--device", default="cpu")
     args = p.parse_args()
@@ -79,6 +90,16 @@ def main() -> None:
 
     item_pop = build_item_popularity(split.train, split.n_items)
     cindex = ContentIndex.from_npz(args.embeddings, split.item_id_map) if args.embeddings else None
+
+    aux_ctx = None
+    if args.movies and args.users:
+        print("building orthogonal features (genres, year, demographics, co-occurrence PMI)...")
+        genre_mat, years = load_movie_features(args.movies, split.item_id_map, split.n_items)
+        user_demo = load_user_features(args.users, split.user_ids)
+        pmi = build_cooccurrence_pmi(split.train, split.n_items)
+        aux_ctx = AuxFeatureContext(genre_mat, years, user_demo, pmi)
+    names = feature_names(aux_ctx)
+    cat = AUX_CATEGORICAL if aux_ctx is not None else None
 
     # Training task: history = train, target = valid. 10% of users are
     # held out for early stopping so the test set is never consulted
@@ -99,7 +120,7 @@ def main() -> None:
         return build_ranking_dataset(
             [tr_cands[i] for i in idx], [tr_scores[i] for i in idx],
             [tr_hist[i] for i in idx], [split.valid_target[i] for i in idx],
-            item_pop, cindex)
+            item_pop, cindex, aux_ctx)
 
     train_ds = subset(fit)
     earlystop_ds = subset(es)
@@ -110,16 +131,16 @@ def main() -> None:
     te_cands, te_scores = candidates_with_scores(
         model, te_hist, split.mask_token, cfg["max_len"], args.k, args.device)
     test_ds = build_ranking_dataset(te_cands, te_scores, te_hist,
-                                    split.test_target, item_pop, cindex)
+                                    split.test_target, item_pop, cindex, aux_ctx)
 
     print("training LambdaRank...")
-    booster = train_ranker(train_ds, valid_ds=earlystop_ds)
+    booster = train_ranker(train_ds, valid_ds=earlystop_ds, names=names, categorical=cat)
 
     baseline = ranked_metrics(te_cands, split.test_target)
     reranked = rerank(booster, test_ds)
     ranked = ranked_metrics(reranked, split.test_target)
 
-    importance = dict(zip(FEATURE_NAMES,
+    importance = dict(zip(names,
                           booster.feature_importance("gain").round(1).tolist()))
     cand_ceiling = float(np.mean([t in c for c, t in zip(te_cands, split.test_target)]))
 
@@ -130,10 +151,16 @@ def main() -> None:
         "feature_importance_gain": importance,
         "best_iteration": booster.best_iteration,
         "content_features_enabled": cindex is not None,
+        "aux_features_enabled": aux_ctx is not None,
     }
     print(json.dumps(report, indent=2))
     Path("results").mkdir(exist_ok=True)
-    out = "results/ranker_experiment.json" if cindex else "results/ranker_experiment_nocontent.json"
+    if aux_ctx is not None:
+        out = "results/ranker_experiment_aux.json"
+    elif cindex is not None:
+        out = "results/ranker_experiment.json"
+    else:
+        out = "results/ranker_experiment_nocontent.json"
     Path(out).write_text(json.dumps(report, indent=2))
     booster.save_model("checkpoints/ranker.txt")
     print(f"\nsaved {out} and checkpoints/ranker.txt")

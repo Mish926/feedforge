@@ -46,7 +46,7 @@ try:
 except ImportError as e:  # pragma: no cover
     raise ImportError("pip install lightgbm") from e
 
-FEATURE_NAMES = [
+BASE_FEATURE_NAMES = [
     "collab_rank",
     "collab_score",
     "content_sim",
@@ -55,6 +55,15 @@ FEATURE_NAMES = [
     "item_pop_log",
     "user_len_log",
 ]
+# Kept as an alias for backward compatibility with existing callers/tests.
+FEATURE_NAMES = BASE_FEATURE_NAMES
+
+
+def feature_names(aux_ctx=None) -> list[str]:
+    if aux_ctx is None:
+        return list(BASE_FEATURE_NAMES)
+    from .features import AUX_FEATURE_NAMES
+    return list(BASE_FEATURE_NAMES) + list(AUX_FEATURE_NAMES)
 
 
 @dataclass
@@ -80,10 +89,12 @@ def build_ranking_dataset(
     targets: Optional[Sequence[int]],      # None at pure inference time
     item_pop: np.ndarray,
     content_index=None,                    # feedforge.content.ContentIndex or None
+    aux_ctx=None,                          # feedforge.features.AuxFeatureContext or None
 ) -> RankingDataset:
     rows, labels, groups, cand_ids = [], [], [], []
 
     for u, (cands, scores, hist) in enumerate(zip(candidates, collab_scores, histories)):
+        uctx = aux_ctx.user_context(u, hist) if aux_ctx is not None else None
         # User content profile: mean of last-10 history embeddings
         profile = last_vec = None
         if content_index is not None:
@@ -106,10 +117,13 @@ def build_ranking_dataset(
                         sim = float(np.dot(v, profile))
                     if last_vec is not None:
                         sim_last = float(np.dot(v, last_vec))
-            rows.append([
+            row = [
                 float(rank), float(score), sim, sim_last, has_content,
                 math.log1p(item_pop[item]), user_len_log,
-            ])
+            ]
+            if uctx is not None:
+                row.extend(aux_ctx.features_for(uctx, item))
+            rows.append(row)
             if targets is not None:
                 labels.append(1 if item == targets[u] else 0)
         groups.append(len(cands))
@@ -129,6 +143,8 @@ def train_ranker(
     num_boost_round: int = 300,
     early_stopping_rounds: int = 30,
     params: Optional[dict] = None,
+    names: Optional[list] = None,
+    categorical: Optional[list] = None,
 ) -> "lgb.Booster":
     default_params = {
         "objective": "lambdarank",
@@ -145,13 +161,15 @@ def train_ranker(
     if params:
         default_params.update(params)
 
+    names = names or FEATURE_NAMES
+    cat = categorical or "auto"
     dtrain = lgb.Dataset(train_ds.X, label=train_ds.y, group=train_ds.groups,
-                         feature_name=FEATURE_NAMES)
+                         feature_name=names, categorical_feature=cat)
     valid_sets, callbacks = [dtrain], []
     if valid_ds is not None:
         valid_sets.append(lgb.Dataset(valid_ds.X, label=valid_ds.y,
                                       group=valid_ds.groups, reference=dtrain,
-                                      feature_name=FEATURE_NAMES))
+                                      feature_name=names, categorical_feature=cat))
         callbacks.append(lgb.early_stopping(early_stopping_rounds, verbose=False))
 
     return lgb.train(default_params, dtrain, num_boost_round=num_boost_round,

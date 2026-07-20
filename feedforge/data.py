@@ -40,6 +40,7 @@ class SplitData:
     test_target: list[int]      # per user: s[-1]
     n_items: int                # dense item count (ids are 1..n_items)
     item_id_map: dict           # original id -> dense id
+    user_ids: list = None       # original user ids, aligned with train rows
 
     @property
     def mask_token(self) -> int:
@@ -81,14 +82,15 @@ def build_sequences(df: pd.DataFrame, min_seq_len: int = 5) -> SplitData:
     # Stable sort by timestamp within user preserves within-second order
     df = df.sort_values(["user_id", "timestamp"], kind="stable")
 
-    train, valid_t, test_t = [], [], []
-    for _, group in df.groupby("user_id", sort=False):
+    train, valid_t, test_t, user_ids = [], [], [], []
+    for uid, group in df.groupby("user_id", sort=False):
         seq = group["item"].tolist()
         if len(seq) < min_seq_len:
             continue
         train.append(seq[:-2])
         valid_t.append(seq[-2])
         test_t.append(seq[-1])
+        user_ids.append(uid)
 
     return SplitData(
         train=train,
@@ -96,6 +98,7 @@ def build_sequences(df: pd.DataFrame, min_seq_len: int = 5) -> SplitData:
         test_target=test_t,
         n_items=len(unique_items),
         item_id_map=item_id_map,
+        user_ids=user_ids,
     )
 
 
