@@ -144,7 +144,7 @@ def build_parser() -> argparse.ArgumentParser:
     p.add_argument("--n-layers", type=int, default=2)
     p.add_argument("--dropout", type=float, default=0.1)
     p.add_argument("--eval-every", type=int, default=10)
-    p.add_argument("--workers", type=int, default=2)
+    p.add_argument("--workers", type=int, default=0)
     p.add_argument("--device", default=None, help="cuda / mps / cpu (auto if omitted)")
     return p
 

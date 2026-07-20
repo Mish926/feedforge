@@ -1,5 +1,5 @@
 torch>=2.0
 pandas
-numpy
+numpy<2
 tqdm
 pytest

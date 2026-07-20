@@ -52,7 +52,7 @@ class BERT4Rec(nn.Module):
             activation="gelu",
             batch_first=True,
         )
-        self.encoder = nn.TransformerEncoder(layer, num_layers=n_layers)
+        self.encoder = nn.TransformerEncoder(layer, num_layers=n_layers, enable_nested_tensor=False)
         self.out_bias = nn.Parameter(torch.zeros(vocab_size))
 
         self._init_weights()
