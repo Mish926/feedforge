@@ -90,11 +90,14 @@ def build_ranking_dataset(
     item_pop: np.ndarray,
     content_index=None,                    # feedforge.content.ContentIndex or None
     aux_ctx=None,                          # feedforge.features.AuxFeatureContext or None
+    user_rows=None,                        # explicit demographic row per user;
+                                           # defaults to positional index
 ) -> RankingDataset:
     rows, labels, groups, cand_ids = [], [], [], []
 
     for u, (cands, scores, hist) in enumerate(zip(candidates, collab_scores, histories)):
-        uctx = aux_ctx.user_context(u, hist) if aux_ctx is not None else None
+        demo_row = user_rows[u] if user_rows is not None else u
+        uctx = aux_ctx.user_context(demo_row, hist) if aux_ctx is not None else None
         # User content profile: mean of last-10 history embeddings
         profile = last_vec = None
         if content_index is not None:

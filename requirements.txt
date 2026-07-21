@@ -8,3 +8,8 @@ requests
 torchvision
 pillow
 lightgbm
+fastapi
+uvicorn[standard]
+locust
+redis
+httpx2

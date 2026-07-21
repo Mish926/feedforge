@@ -1,0 +1,249 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="dark">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>FeedForge</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Archivo+Narrow:wght@500;600;700&family=Source+Serif+4:opsz,wght@8..60,400;8..60,600&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+:root[data-theme="light"] {
+  --bg: #f4f3f0; --surface: #fcfbfa; --surface-2: #edebe7; --line: #e0ddd8;
+  --ink: #2b2e33; --ink-dim: #6a6f77; --ink-faint: #9b9fa6;
+  --accent: #55748c; --accent-bg: #e7edf2;
+  --up: #4f7a5e; --down: #9a6467; --new: #6b6291;
+  --shadow: 0 1px 2px rgba(40,40,40,.04), 0 6px 18px rgba(40,40,40,.05);
+}
+:root[data-theme="dark"] {
+  --bg: #16191e; --surface: #1d2128; --surface-2: #242931; --line: #2f353f;
+  --ink: #dde2e8; --ink-dim: #939ba8; --ink-faint: #656d7a;
+  --accent: #86a5bd; --accent-bg: #23303c;
+  --up: #86ad92; --down: #b58e91; --new: #a49bc9;
+  --shadow: 0 1px 2px rgba(0,0,0,.4), 0 8px 24px rgba(0,0,0,.28);
+}
+* { box-sizing: border-box; }
+body { margin: 0; background: var(--bg); color: var(--ink); line-height: 1.5;
+  font-family: "Archivo Narrow", system-ui, sans-serif; transition: background .3s, color .3s; }
+h1, h2 { margin: 0; font-weight: 600; }
+
+header { display: flex; align-items: center; gap: 16px; padding: 16px 30px;
+  border-bottom: 1px solid var(--line); background: var(--surface); }
+.logo { font-size: 20px; letter-spacing: .17em; text-transform: uppercase; font-weight: 700; }
+.logo span { color: var(--accent); }
+.spacer { flex: 1; }
+.toggle { background: var(--surface-2); border: 1px solid var(--line); color: var(--ink-dim);
+  border-radius: 999px; padding: 6px 15px; cursor: pointer; font: inherit; font-size: 12px;
+  letter-spacing: .08em; text-transform: uppercase; }
+.toggle:hover { color: var(--ink); border-color: var(--accent); }
+.toggle:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
+
+main { max-width: 1060px; margin: 0 auto; padding: 34px 30px 70px; }
+
+.bar { display: flex; gap: 16px; align-items: flex-end; flex-wrap: wrap;
+  padding-bottom: 24px; border-bottom: 1px solid var(--line); }
+label.field { display: flex; flex-direction: column; gap: 7px; font-size: 11px;
+  letter-spacing: .11em; text-transform: uppercase; color: var(--ink-faint); }
+select, input[type=number] { background: var(--surface); border: 1px solid var(--line);
+  color: var(--ink); border-radius: 8px; padding: 10px 13px; font: inherit; font-size: 14px;
+  min-width: 150px; }
+select:focus, input:focus { outline: 2px solid var(--accent); outline-offset: 1px; }
+button.go { background: var(--accent); color: var(--surface); border: none; border-radius: 8px;
+  padding: 11px 24px; font: inherit; font-weight: 600; font-size: 14px; letter-spacing: .05em;
+  text-transform: uppercase; cursor: pointer; }
+button.go:hover { filter: brightness(1.1); }
+button.go:disabled { opacity: .45; cursor: default; }
+
+section { margin-top: 34px; }
+.head { display: flex; align-items: baseline; gap: 14px; flex-wrap: wrap; margin-bottom: 14px; }
+.title { font-size: 13px; letter-spacing: .13em; text-transform: uppercase; color: var(--ink-faint); }
+.meta { font-family: "JetBrains Mono", monospace; font-size: 12px; color: var(--ink-faint);
+  margin-left: auto; }
+
+.strip { display: flex; gap: 11px; overflow-x: auto; padding-bottom: 6px; }
+.strip .card { flex: 0 0 82px; }
+.poster { width: 100%; aspect-ratio: 2/3; object-fit: cover; border-radius: 6px;
+  background: var(--surface-2); border: 1px solid var(--line); display: block; }
+.cap { font-family: "Source Serif 4", Georgia, serif; font-size: 12px; line-height: 1.3;
+  margin-top: 6px; color: var(--ink-dim); display: -webkit-box; -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical; overflow: hidden; }
+
+.seg { display: inline-flex; background: var(--surface-2); border: 1px solid var(--line);
+  border-radius: 999px; padding: 3px; }
+.seg button { background: none; border: none; color: var(--ink-dim); font: inherit;
+  font-size: 12px; letter-spacing: .07em; text-transform: uppercase; padding: 6px 15px;
+  border-radius: 999px; cursor: pointer; }
+.seg button[aria-pressed="true"] { background: var(--accent); color: var(--surface); }
+.seg button:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
+
+ol.list { list-style: none; margin: 0; padding: 0; display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(240px, 1fr)); gap: 12px; }
+ol.list li { display: grid; grid-template-columns: 20px 46px 1fr auto; gap: 12px;
+  align-items: center; padding: 9px 12px; border-radius: 9px; background: var(--surface);
+  border: 1px solid var(--line); box-shadow: var(--shadow);
+  animation: rise .28s ease both; }
+@keyframes rise { from { opacity: 0; transform: translateY(5px); } to { opacity: 1; transform: none; } }
+@media (prefers-reduced-motion: reduce) { ol.list li { animation: none; } }
+.rank { font-family: "JetBrains Mono", monospace; font-size: 13px; color: var(--ink-faint);
+  text-align: right; }
+.thumb { width: 46px; aspect-ratio: 2/3; object-fit: cover; border-radius: 4px;
+  background: var(--surface-2); }
+.name { font-family: "Source Serif 4", Georgia, serif; font-size: 14.5px; line-height: 1.3; }
+.mv { font-size: 11px; letter-spacing: .04em; white-space: nowrap; }
+.mv.up { color: var(--up); } .mv.down { color: var(--down); } .mv.new { color: var(--new); }
+
+.stats { display: flex; gap: 26px; flex-wrap: wrap; margin-top: 20px; padding-top: 18px;
+  border-top: 1px solid var(--line); }
+.stat .k { font-size: 10px; letter-spacing: .14em; text-transform: uppercase; color: var(--ink-faint); }
+.stat .v { font-family: "JetBrains Mono", monospace; font-size: 16px; margin-top: 3px; }
+.empty { color: var(--ink-faint); font-style: italic; font-family: "Source Serif 4", serif; }
+footer { margin-top: 42px; padding-top: 16px; border-top: 1px solid var(--line);
+  font-family: "Source Serif 4", Georgia, serif; font-size: 13px; color: var(--ink-faint); }
+footer a { color: var(--accent); }
+</style>
+</head>
+<body>
+<header>
+  <div class="logo">Feed<span>Forge</span></div>
+  <div class="spacer"></div>
+  <button class="toggle" id="theme-btn">Light</button>
+</header>
+
+<main>
+  <div class="bar">
+    <label class="field">Viewer
+      <select id="user-select"><option>loading…</option></select>
+    </label>
+    <label class="field">Titles
+      <input type="number" id="n-input" value="10" min="1" max="24">
+    </label>
+    <button class="go" id="run-btn">Recommend</button>
+  </div>
+
+  <section id="hist-section" hidden>
+    <div class="head"><h2 class="title">Recently watched</h2></div>
+    <div class="strip" id="history"></div>
+  </section>
+
+  <section id="rec-section" hidden>
+    <div class="head">
+      <h2 class="title">Recommended</h2>
+      <div class="seg" role="group" aria-label="Ranking version">
+        <button id="btn-baseline" aria-pressed="true">Shortlist</button>
+        <button id="btn-reranked" aria-pressed="false">Re-sorted</button>
+      </div>
+      <span class="meta" id="list-meta"></span>
+    </div>
+    <ol class="list" id="list"></ol>
+    <div class="stats" id="stats"></div>
+  </section>
+
+  <section id="idle">
+    <p class="empty">Choose a viewer to see their recommendations.</p>
+  </section>
+
+  <footer>
+    MovieLens-1M · 6,040 viewers · 3,706 films. Method and evaluation:
+    <a href="https://github.com/Mish926/feedforge">github.com/Mish926/feedforge</a>
+  </footer>
+</main>
+
+<script>
+const $ = (id) => document.getElementById(id);
+let current = null, view = "baseline";
+
+const saved = localStorage.getItem("ff-theme")
+  || (matchMedia("(prefers-color-scheme: light)").matches ? "light" : "dark");
+setTheme(saved);
+$("theme-btn").onclick = () =>
+  setTheme(document.documentElement.dataset.theme === "dark" ? "light" : "dark");
+function setTheme(t) {
+  document.documentElement.dataset.theme = t;
+  $("theme-btn").textContent = t === "dark" ? "Light" : "Dark";
+  localStorage.setItem("ff-theme", t);
+}
+
+async function loadUsers() {
+  const d = await fetch("/api/users?limit=80").then(r => r.json());
+  const sel = $("user-select"); sel.innerHTML = "";
+  d.users.forEach(u => {
+    const o = document.createElement("option");
+    o.value = u.user_id; o.textContent = `Viewer ${u.user_id}`;
+    sel.appendChild(o);
+  });
+}
+
+function render() {
+  if (!current) return;
+  const base = current.baseline.items, rk = current.reranked.items;
+  const items = view === "baseline" ? base : rk;
+  const pos = new Map(base.map((it, i) => [it.item_id, i]));
+
+  const ol = $("list"); ol.innerHTML = "";
+  items.forEach((it, i) => {
+    let mv = "";
+    if (view === "reranked") {
+      const was = pos.get(it.item_id);
+      if (was === undefined) mv = `<span class="mv new">new</span>`;
+      else if (was > i) mv = `<span class="mv up">&#8593;${was - i}</span>`;
+      else if (was < i) mv = `<span class="mv down">&#8595;${i - was}</span>`;
+      else mv = `<span class="mv"></span>`;
+    }
+    const img = it.poster
+      ? `<img class="thumb" src="${it.poster}" alt="" loading="lazy" onerror="this.style.visibility='hidden'">`
+      : `<div class="thumb"></div>`;
+    const li = document.createElement("li");
+    li.style.animationDelay = `${Math.min(i * 22, 260)}ms`;
+    li.innerHTML = `<span class="rank">${i + 1}</span>${img}
+      <span class="name">${it.title}</span>${mv}`;
+    ol.appendChild(li);
+  });
+
+  const src = view === "baseline" ? current.baseline : current.reranked;
+  $("list-meta").textContent = `${src.latency_ms} ms`;
+  $("btn-baseline").setAttribute("aria-pressed", view === "baseline");
+  $("btn-reranked").setAttribute("aria-pressed", view === "reranked");
+
+  $("stats").innerHTML = `
+    <div class="stat"><div class="k">Shortlisted</div>
+      <div class="v">${current.baseline.candidates_considered} of 3,706</div></div>
+    <div class="stat"><div class="k">Shared with shortlist</div>
+      <div class="v">${current.overlap_at_n} of ${base.length}</div></div>
+    <div class="stat"><div class="k">Serving</div>
+      <div class="v">${current.assigned_arm === "baseline" ? "Shortlist" : "Re-sorted"}</div></div>`;
+}
+
+async function run() {
+  const id = $("user-select").value, n = $("n-input").value;
+  if (!id) return;
+  $("run-btn").disabled = true;
+  const [h, c] = await Promise.all([
+    fetch(`/api/user/${id}?limit=14`).then(r => r.json()),
+    fetch(`/api/compare/${id}?n=${n}`).then(r => r.json()),
+  ]);
+  current = c;
+
+  const strip = $("history"); strip.innerHTML = "";
+  h.history.forEach(i => {
+    const d = document.createElement("div"); d.className = "card";
+    d.innerHTML = `${i.poster ? `<img class="poster" src="${i.poster}" alt="" loading="lazy"
+      onerror="this.style.visibility='hidden'">` : `<div class="poster"></div>`}
+      <div class="cap">${i.title}</div>`;
+    strip.appendChild(d);
+  });
+
+  $("idle").hidden = true;
+  $("hist-section").hidden = false;
+  $("rec-section").hidden = false;
+  render();
+  fetch(`/api/recommend/${id}?n=${n}`);
+  $("run-btn").disabled = false;
+}
+
+$("btn-baseline").onclick = () => { view = "baseline"; render(); };
+$("btn-reranked").onclick = () => { view = "reranked"; render(); };
+$("run-btn").onclick = run;
+loadUsers();
+</script>
+</body>
+</html>
