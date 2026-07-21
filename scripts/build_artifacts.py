@@ -19,6 +19,8 @@ import re
 import sys
 from pathlib import Path
 
+import numpy as np
+
 sys.path.insert(0, str(Path(__file__).resolve().parent.parent))
 
 from feedforge.data import build_sequences, load_movielens_1m  # noqa: E402
@@ -40,7 +42,19 @@ def main() -> None:
     p.add_argument("--out", default="artifacts/serving.pkl")
     args = p.parse_args()
 
-    split = build_sequences(load_movielens_1m(args.data))
+    df = load_movielens_1m(args.data)
+    split = build_sequences(df)
+
+    # Per-item rating stats, straight from the ratings the sequences were
+    # built from. Mapped onto dense ids so serving needs no join.
+    print("computing rating stats...")
+    df_dense = df.assign(item=df["item_id"].map(split.item_id_map)).dropna(subset=["item"])
+    grouped = df_dense.groupby("item")["rating"].agg(["mean", "count"])
+    rating_mean = np.zeros(split.n_items + 1, dtype=np.float32)
+    rating_count = np.zeros(split.n_items + 1, dtype=np.int32)
+    for item, row in grouped.iterrows():
+        rating_mean[int(item)] = float(row["mean"])
+        rating_count[int(item)] = int(row["count"])
 
     full_history = [tr + [v, t] for tr, v, t in
                     zip(split.train, split.valid_target, split.test_target)]
@@ -75,6 +89,8 @@ def main() -> None:
         "user_demo": user_demo,
         "pmi": pmi,
         "item_pop": item_pop,
+        "rating_mean": rating_mean,
+        "rating_count": rating_count,
     }
     out = Path(args.out)
     out.parent.mkdir(parents=True, exist_ok=True)
