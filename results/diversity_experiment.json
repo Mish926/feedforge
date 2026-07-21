@@ -1,0 +1,95 @@
+{
+  "n_users_sampled": 1500,
+  "candidate_pool": 50,
+  "list_size": 10,
+  "tradeoff_curve": [
+    {
+      "lambda": 1.0,
+      "ndcg@10": 0.15444,
+      "intra_list_similarity": 0.4886,
+      "mean_genres_covered": 7.0,
+      "exposure": {
+        "bucket0": 0.32506666666666667,
+        "bucket1": 0.3314,
+        "bucket2": 0.34353333333333336
+      }
+    },
+    {
+      "lambda": 0.9,
+      "ndcg@10": 0.15432,
+      "intra_list_similarity": 0.4704,
+      "mean_genres_covered": 7.33,
+      "exposure": {
+        "bucket0": 0.32233333333333336,
+        "bucket1": 0.3312,
+        "bucket2": 0.34646666666666665
+      }
+    },
+    {
+      "lambda": 0.8,
+      "ndcg@10": 0.15411,
+      "intra_list_similarity": 0.4389,
+      "mean_genres_covered": 7.85,
+      "exposure": {
+        "bucket0": 0.31626666666666664,
+        "bucket1": 0.3350666666666667,
+        "bucket2": 0.3486666666666667
+      }
+    },
+    {
+      "lambda": 0.7,
+      "ndcg@10": 0.15104,
+      "intra_list_similarity": 0.4067,
+      "mean_genres_covered": 8.4,
+      "exposure": {
+        "bucket0": 0.3138666666666667,
+        "bucket1": 0.3347333333333333,
+        "bucket2": 0.3514
+      }
+    },
+    {
+      "lambda": 0.6,
+      "ndcg@10": 0.14912,
+      "intra_list_similarity": 0.3712,
+      "mean_genres_covered": 9.03,
+      "exposure": {
+        "bucket0": 0.30933333333333335,
+        "bucket1": 0.33726666666666666,
+        "bucket2": 0.3534
+      }
+    },
+    {
+      "lambda": 0.5,
+      "ndcg@10": 0.14207,
+      "intra_list_similarity": 0.3325,
+      "mean_genres_covered": 9.73,
+      "exposure": {
+        "bucket0": 0.30773333333333336,
+        "bucket1": 0.3358,
+        "bucket2": 0.35646666666666665
+      }
+    },
+    {
+      "lambda": 0.3,
+      "ndcg@10": 0.12952,
+      "intra_list_similarity": 0.2728,
+      "mean_genres_covered": 10.96,
+      "exposure": {
+        "bucket0": 0.3035333333333333,
+        "bucket1": 0.3359333333333333,
+        "bucket2": 0.3605333333333333
+      }
+    }
+  ],
+  "catalog_popularity_distribution": {
+    "bucket0": 0.33316500173560337,
+    "bucket1": 0.33323483067494225,
+    "bucket2": 0.33360016758945443
+  },
+  "note": "exposure buckets are equal-mass in interactions: bucket2 is the head, bucket0 the long tail. Comparing exposure against catalog_popularity_distribution shows whether the recommender amplifies or reflects existing popularity.",
+  "suggested_operating_point": {
+    "lambda": 0.7,
+    "ndcg_relative_cost": 0.022,
+    "intra_list_similarity_reduction": 0.0819
+  }
+}
